@@ -126,7 +126,7 @@ footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px sol
   <div class="notice">Prototype limitation: WFM is not connected. Screenshot import is only captured for testing in this first phone prototype.</div>
 </div>
 </main>
-<footer>Prototype V1.4 • Data stays on this device in this prototype</footer>
+<footer>Prototype V1.5 • Data stays on this device in this prototype</footer>
 
 <div class="modal" id="modal">
   <div class="sheet">
@@ -245,7 +245,7 @@ function renderBanks(){
 }
 function editBank(i){const b=state.banks[i],v=prompt(`Balance for ${b[0]}`,b[1]);if(v!==null){state.banks[i][1]=v;persist();renderBanks()}}
 function addBank(){const n=prompt('Bank name');if(!n)return;const v=prompt('Balance','0');state.banks.push([n,v||'0','hours']);persist();renderBanks()}
-function wfmPicked(){const f=document.getElementById('wfmFile').files[0];document.getElementById('wfmStatus').textContent=f?`Selected: ${f.name}. Screenshot captured for prototype testing; automatic reading is not enabled in V1.4.`:''}
+function wfmPicked(){const f=document.getElementById('wfmFile').files[0];document.getElementById('wfmStatus').textContent=f?`Selected: ${f.name}. Screenshot captured for prototype testing; automatic reading is not enabled in V1.5.`:''}
 document.getElementById('rate').value=state.settings.rate;
 document.getElementById('targetShifts').value=state.settings.targetShifts;
 calcPay();refresh();renderCal();renderBanks();
