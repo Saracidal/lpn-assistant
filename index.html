@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f7c86">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>LPN Assistant</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--teal:#0f7c86;--teal2:#16a6a6;--ink:#17313b;--muted:#64777d;--bg:#f3f7f8;--card:#fff;--line:#dce7e9;--pink:#e45c86;--gold:#e7a928}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(135deg,#0f7c86,#225c85);color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#0b5661,#e45c86);display:grid;place-items:center;font-weight:900;font-size:24px;box-shadow:0 5px 15px #0002}.brand h1{font-size:21px;margin:0}.brand small{opacity:.85}
+nav{display:flex;gap:7px;overflow:auto;margin-top:14px}nav button{border:0;background:#ffffff22;color:#fff;padding:9px 12px;border-radius:999px;white-space:nowrap;font-weight:700}nav button.active{background:#fff;color:var(--teal)}
+main{max-width:760px;margin:auto;padding:14px 14px 90px}.view{display:none}.view.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin:12px 0;box-shadow:0 2px 8px #183b4410}.card h2,.card h3{margin:0 0 9px}.muted{color:var(--muted)}.big{font-size:28px;font-weight:850}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{background:#f7fbfb;border-radius:13px;padding:12px;border:1px solid var(--line)}.stat b{display:block;font-size:20px}
+button,.btn{font:inherit}.primary{background:var(--teal);color:#fff;border:0;border-radius:11px;padding:11px 14px;font-weight:800}.secondary{background:#edf5f6;color:var(--teal);border:1px solid #cce0e2;border-radius:11px;padding:10px 13px;font-weight:750}.danger{background:#fff0f3;color:#b4315d;border:1px solid #f0c4d1;border-radius:11px;padding:9px 12px}
+label{display:block;font-weight:700;margin:10px 0 5px}input,select{width:100%;padding:11px;border:1px solid #cbdadd;border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.notice{background:#fff8e7;border:1px solid #f1dfad;padding:11px;border-radius:11px;color:#71540b}.success{background:#edf9f4;border:1px solid #bfe7d5;padding:11px;border-radius:11px}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px 5px;border-bottom:1px solid var(--line);font-size:14px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.dow{font-size:11px;text-align:center;color:var(--muted);font-weight:800;padding:4px}.day{min-height:74px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:5px;font-size:12px}.daynum{font-weight:850}.shift{display:block;margin-top:4px;border-radius:6px;padding:3px 4px;background:#e8f5f6;color:#075b64;font-weight:800;font-size:10px}.night{background:#e9e8fb;color:#46458b}.sh{background:#fff0c9;color:#76560a}.event{background:#fce8ef;color:#8f3153}.swap{background:#e7f1ff;color:#28588b}
+footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:8px;text-align:center;color:var(--muted);font-size:11px}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;z-index:20}.modal.show{display:flex}.sheet{background:#fff;width:100%;max-height:90vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px}
+.link{color:var(--teal);font-weight:750;text-decoration:none;display:block;padding:10px 0;border-bottom:1px solid var(--line)}
+@media(min-width:650px){main{padding-top:20px}.grid{grid-template-columns:repeat(4,1fr)}.day{min-height:90px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">S</div><div><h1>LPN Assistant</h1><small>Built for LPNs. By an LPN.</small></div></div>
+  <nav id="nav">
+    <button data-view="home" class="active">Home</button>
+    <button data-view="calendar">Calendar</button>
+    <button data-view="pay">Pay</button>
+    <button data-view="banks">Banks</button>
+    <button data-view="rules">Rules</button>
+    <button data-view="tutorial">Tutorial</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="view active">
+  <div class="card">
+    <div class="row"><div><div class="muted">This Pay Period</div><div class="big" id="ppTitle">—</div></div><div class="big" id="projected">$0</div></div>
+    <div class="grid" style="margin-top:12px">
+      <div class="stat"><span class="muted">Shifts</span><b id="actualShifts">0 / 8</b></div>
+      <div class="stat"><span class="muted">Paid hours</span><b id="actualHours">0.0</b></div>
+      <div class="stat"><span class="muted">Target hours</span><b id="targetHours">88.0</b></div>
+      <div class="stat"><span class="muted">Short</span><b id="shortfall">0 shifts</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Next useful action</h3>
+    <div id="actionText" class="muted">Add your schedule in Calendar or import a WFM screenshot later.</div>
+    <div class="actions" style="margin-top:10px"><button class="primary" onclick="showView('calendar')">Open Calendar</button><button class="secondary" onclick="showView('pay')">Pay Calculator</button></div>
+  </div>
+  <div class="card">
+    <h3>Core rules loaded</h3>
+    <table><tr><td>Normal 12-hour shift</td><td><b>11 paid hours</b></td></tr><tr><td>Personal leave day</td><td><b>7.5 hours</b></td></tr><tr><td>Target</td><td><b>8 shifts / 14 days</b></td></tr><tr><td>Special leave</td><td><b>Balance only; approval required</b></td></tr></table>
+  </div>
+</section>
+
+<section id="calendar" class="view">
+  <div class="card">
+    <div class="row"><div><h2>Calendar</h2><div class="muted">Tap a day to add or edit a shift/event.</div></div><button class="primary" onclick="openAdd()">+ Add</button></div>
+  </div>
+  <div class="card"><div class="row"><button class="secondary" onclick="changeMonth(-1)">‹</button><h3 id="monthTitle">September 2026</h3><button class="secondary" onclick="changeMonth(1)">›</button></div><div class="calendar" id="cal"></div></div>
+  <div class="card">
+    <h3>WFM screenshot</h3>
+    <p class="muted">For this prototype, use the button below to choose a WFM screenshot from your phone. The production version can turn that screenshot into scheduled entries after we validate the workflow.</p>
+    <input id="wfmFile" type="file" accept="image/*" onchange="wfmPicked()">
+    <div id="wfmStatus" class="muted" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<section id="pay" class="view">
+  <div class="card"><h2>Pay Calculator</h2><p class="muted">Money is calculated separately from the calendar's hours.</p>
+    <label>Base hourly rate</label><input id="rate" type="number" step=".01" value="41.35" oninput="saveSettings();calcPay()">
+    <label>Paid hours</label><input id="payHours" type="number" step=".01" value="11" oninput="calcPay()">
+    <label>Regular premium hours</label><input id="regPremH" type="number" step=".01" value="0" oninput="calcPay()">
+    <label>Regular premium rate</label><input id="regPremR" type="number" step=".01" value="2.15" oninput="calcPay()">
+    <label>Evening premium hours</label><input id="eveH" type="number" step=".01" value="0" oninput="calcPay()">
+    <label>Evening premium rate</label><input id="eveR" type="number" step=".01" value="1.40" oninput="calcPay()">
+    <label>Night premium hours</label><input id="nightH" type="number" step=".01" value="0" oninput="calcPay()">
+    <label>Night premium rate</label><input id="nightR" type="number" step=".01" value="5.00" oninput="calcPay()">
+    <div class="success" style="margin-top:12px"><div class="muted">Estimated gross</div><div class="big" id="calcGross">$0.00</div></div>
+  </div>
+  <div class="card"><h3>Pay-period target</h3>
+    <label>Target shifts</label><input id="targetShifts" type="number" min="0" value="8" oninput="saveSettings();refresh()">
+    <div class="grid" style="margin-top:10px"><div class="stat"><span class="muted">Target paid hours</span><b id="targetHours2">88.0</b></div><div class="stat"><span class="muted">Approx. target gross</span><b id="targetGross">$0</b></div></div>
+  </div>
+</section>
+
+<section id="banks" class="view">
+  <div class="card"><h2>Benefit & Leave Banks</h2><p class="muted">Balances are entered manually for now. This prototype does not connect to WFM or payroll.</p>
+    <div id="bankRows"></div>
+    <button class="primary" onclick="addBank()">+ Add / edit bank</button>
+  </div>
+  <div class="notice">Special Leave is shown as a balance only. Do not treat it as freely usable; your manager's approval rules still apply.</div>
+</section>
+
+<section id="rules" class="view">
+  <div class="card"><h2>Pay Rules & Resources</h2><p class="muted">Official sources are the source of truth. App calculations are a tracking aid, not payroll advice.</p>
+    <a class="link" href="https://www.bcnu.org/contracts-and-bargaining/your-collective-agreement" target="_blank">BCNU — Your Collective Agreement</a>
+    <a class="link" href="https://www.bcnu.org/contracts-and-bargaining/your-collective-agreement/nurses-bargaining-association" target="_blank">BCNU — Nurses' Bargaining Association</a>
+    <a class="link" href="https://www2.gov.bc.ca/gov/content/employment-business/employment-standards-advice" target="_blank">BC Employment Standards</a>
+    <a class="link" href="https://www.interiorhealth.ca/careers/employee-benefits" target="_blank">Interior Health — Employee Benefits</a>
+    <a class="link" href="https://www.interiorhealth.ca/careers" target="_blank">Interior Health</a>
+  </div>
+  <div class="card"><h3>Important</h3><p class="muted">Collective-agreement language can change. Check the official BCNU source before relying on a rule for a payroll dispute.</p></div>
+</section>
+
+<section id="tutorial" class="view">
+  <div class="card"><h2>How to use LPN Assistant</h2>
+  <ol>
+    <li>Enter your hourly rate in Pay.</li>
+    <li>Enter or import your WFM schedule in Calendar.</li>
+    <li>Tap a shift to record swaps or changes.</li>
+    <li>Calendar tracks hours; Pay converts those hours into an estimate.</li>
+    <li>Home compares your actual shifts with your target.</li>
+    <li>Keep your benefit-bank balances current in Banks.</li>
+    <li>Use Pay Rules & Resources when you need the official rule.</li>
+  </ol>
+  <div class="notice">Prototype limitation: WFM is not connected. Screenshot import is only captured for testing in this first phone prototype.</div>
+</div>
+</main>
+<footer>Prototype V1.4 • Data stays on this device in this prototype</footer>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="row"><h2>Add Calendar Item</h2><button class="danger" onclick="closeModal()">Close</button></div>
+    <label>Date</label><input id="itemDate" type="date">
+    <label>Type</label><select id="itemType"><option value="day">Day Shift</option><option value="night">Night Shift</option><option value="sh">SH Day</option><option value="vacation">Vacation</option><option value="personal">Personal Leave</option><option value="event">Personal Event</option><option value="swap">Shift Swap</option></select>
+    <label>Hours (calendar paid hours)</label><input id="itemHours" type="number" step=".5" value="11">
+    <label>Notes</label><input id="itemNote" placeholder="e.g. Sep 18 Day → Sep 18 Night">
+    <div class="actions" style="margin-top:14px"><button class="primary" onclick="saveItem()">Save</button><button class="secondary" onclick="closeModal()">Cancel</button></div>
+  </div>
+</div>
+
+<script>
+const KEY='lpn_assistant_v14';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ settings:{rate:41.35,targetShifts:8},
+ items:[],
+ banks:[
+  ['Personal Day','15.00','hours'],
+  ['Vacation Balance','54.61','hours'],
+  ['Accrued Vacation','36.34','hours'],
+  ['Sick Balance','5.37','hours'],
+  ['Special Leave','150.00','hours'],
+  ['Banked STAT','0','hours'],
+  ['OT Bank Apr-Sep','0','hours'],
+  ['OT Bank Oct-Mar','0','hours'],
+  ['Union Lieu Time','0','hours']
+ ]
+};
+let viewMonth=new Date(2026,8,1);
+function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
+function money(n){return new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD'}).format(n||0)}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='calendar')renderCal();if(id==='banks')renderBanks();refresh();window.scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+function periodFor(d){
+ const x=new Date(d+'T12:00:00');
+ const anchor=new Date('2026-08-14T12:00:00');
+ const days=Math.floor((x-anchor)/86400000);
+ const k=Math.floor(days/14);
+ const start=new Date(anchor);start.setDate(anchor.getDate()+k*14);
+ const end=new Date(start);end.setDate(start.getDate()+13);
+ return {start,end};
+}
+function fmt(d){return d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'})}
+function currentPeriod(){return periodFor(new Date().toISOString().slice(0,10))}
+function shiftItems(){
+ return state.items.filter(x=>['day','night','sh','swap'].includes(x.type));
+}
+function refresh(){
+ const p=currentPeriod();document.getElementById('ppTitle').textContent=`${fmt(p.start)} – ${fmt(p.end)}`;
+ const inP=state.items.filter(x=>{let d=new Date(x.date+'T12:00:00');return d>=p.start&&d<=p.end});
+ const shifts=inP.filter(x=>['day','night','swap'].includes(x.type));
+ const hours=shifts.reduce((a,x)=>a+Number(x.hours||0),0);
+ const target=Number(state.settings.targetShifts||8);
+ document.getElementById('actualShifts').textContent=`${shifts.length} / ${target}`;
+ document.getElementById('actualHours').textContent=hours.toFixed(1);
+ document.getElementById('targetHours').textContent=(target*11).toFixed(1);
+ document.getElementById('shortfall').textContent=`${Math.max(0,target-shifts.length)} shifts`;
+ document.getElementById('projected').textContent=money(hours*Number(state.settings.rate||0));
+ document.getElementById('targetHours2').textContent=(target*11).toFixed(1);
+ document.getElementById('targetGross').textContent=money(target*11*Number(state.settings.rate||0));
+ document.getElementById('actionText').textContent=shifts.length<target?`You are ${target-shifts.length} shift${target-shifts.length===1?'':'s'} below your target for this pay period.`:'You are at or above your shift target for this pay period.';
+}
+function changeMonth(n){viewMonth.setMonth(viewMonth.getMonth()+n);renderCal()}
+function renderCal(){
+ const y=viewMonth.getFullYear(),m=viewMonth.getMonth();document.getElementById('monthTitle').textContent=viewMonth.toLocaleDateString('en-CA',{month:'long',year:'numeric'});
+ const el=document.getElementById('cal');el.innerHTML=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="dow">${x}</div>`).join('');
+ const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+ for(let i=0;i<first;i++)el.innerHTML+='<div></div>';
+ for(let d=1;d<=days;d++){
+  const date=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const items=state.items.filter(x=>x.date===date);
+  let html=`<div class="day" onclick="openAdd('${date}')"><div class="daynum">${d}</div>`;
+  items.forEach(x=>html+=`<span class="shift ${x.type}">${labelType(x.type)} ${x.hours?x.hours+'h':''}</span>`);
+  html+='</div>';el.innerHTML+=html;
+ }
+}
+function labelType(t){return {day:'DAY',night:'NIGHT',sh:'SH',vacation:'VAC',personal:'PERSONAL',event:'EVENT',swap:'SWAP'}[t]||t}
+function openAdd(date){
+ document.getElementById('itemDate').value=date||new Date().toISOString().slice(0,10);
+ document.getElementById('itemHours').value=11;document.getElementById('itemNote').value='';
+ document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function saveItem(){
+ const type=document.getElementById('itemType').value;
+ let h=Number(document.getElementById('itemHours').value||0);
+ if(type==='personal')h=7.5;
+ if(type==='vacation')h=11;
+ if(type==='sh')h=7.5;
+ state.items.push({id:Date.now(),date:document.getElementById('itemDate').value,type,hours:h,note:document.getElementById('itemNote').value});
+ persist();closeModal();renderCal();refresh();
+}
+function saveSettings(){state.settings.rate=Number(document.getElementById('rate').value||0);state.settings.targetShifts=Number(document.getElementById('targetShifts').value||8);persist()}
+function calcPay(){
+ const r=Number(document.getElementById('rate').value||0),h=Number(document.getElementById('payHours').value||0);
+ const total=h*r+Number(document.getElementById('regPremH').value||0)*Number(document.getElementById('regPremR').value||0)+Number(document.getElementById('eveH').value||0)*Number(document.getElementById('eveR').value||0)+Number(document.getElementById('nightH').value||0)*Number(document.getElementById('nightR').value||0);
+ document.getElementById('calcGross').textContent=money(total);
+}
+function renderBanks(){
+ const el=document.getElementById('bankRows');el.innerHTML=state.banks.map((b,i)=>`<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div><b>${b[0]}</b><div class="muted">${b[2]}</div></div><div style="text-align:right"><b>${b[1]}</b><br><button class="secondary" onclick="editBank(${i})">Edit</button></div></div>`).join('');
+}
+function editBank(i){const b=state.banks[i],v=prompt(`Balance for ${b[0]}`,b[1]);if(v!==null){state.banks[i][1]=v;persist();renderBanks()}}
+function addBank(){const n=prompt('Bank name');if(!n)return;const v=prompt('Balance','0');state.banks.push([n,v||'0','hours']);persist();renderBanks()}
+function wfmPicked(){const f=document.getElementById('wfmFile').files[0];document.getElementById('wfmStatus').textContent=f?`Selected: ${f.name}. Screenshot captured for prototype testing; automatic reading is not enabled in V1.4.`:''}
+document.getElementById('rate').value=state.settings.rate;
+document.getElementById('targetShifts').value=state.settings.targetShifts;
+calcPay();refresh();renderCal();renderBanks();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
